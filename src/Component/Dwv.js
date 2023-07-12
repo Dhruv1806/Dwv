@@ -32,8 +32,19 @@ export const Dwv = () => {
             });
             newDwvApps[i] = app;
           }
+    
           setDwvApps(newDwvApps);
         }
+      };
+
+
+      const [current, setCurrent] = useState(0);
+
+      const nextSlide = () => {
+         setCurrent(current === data.length - 1 ? 0 : current + 1);
+      };
+      const prevSlide = () => {
+         setCurrent(current === 0 ? data.length - 1 : current - 1);
       };
   return (
     <>
@@ -47,6 +58,7 @@ export const Dwv = () => {
       />
       </div>
     <div style={{display: "flex"}}>
+      <div>left click</div>
       <div id="dwv" style={{width: "59%", backgroundColor: "green", height: "557px"}}>
         {data.map((dwvApp, index) => (
           <div style={{height:"100%",width:"100%"}}
@@ -54,10 +66,12 @@ export const Dwv = () => {
             id={`layerGroup${index}`}
             className="layerGroup"
           >
+            {/* Render DWV components */}
           </div>
          
         ))}
       </div>
+      <div>right clic</div>
     </div>
   </>
    

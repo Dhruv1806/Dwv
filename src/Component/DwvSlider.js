@@ -1,131 +1,58 @@
-// import { useState } from 'react';
-// import ReactSimplyCarousel from 'react-simply-carousel';
-// import { App, getDwvVersion } from 'dwv';
-// import {hello} from './images/tree-736885_1280.jpg'
-
-// export const DwvSlider = () => {
-//   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
-//   const [imageFiles, setImageFiles] = useState([]);
-//   const [loadProgresss, setloadProgresss] = useState([]);
-//   const [dwvApps, setDwvApps] = useState([]);
-//   const data=['dhruv','sneh','zeel']
-
-//   const handleFolderSelect = (event) => {
-//     const folder = event.target.files;
-//     const files = Object.values(folder);
-//     if (files && files.length > 0) {
-//       const newDwvApps = [];
-//       const newloadProgresss = [];
-//       for (let i = 0; i < files.length; i++) {
-//         const app = new App();
-//         app.init({
-//           dataViewConfigs: { '*': [{ divId: `layerGroup${i}` }] },
-//         });
-//         app.loadFiles([files[i]]);
-//         app.addEventListener('loadProgresss', (event) => {
-//           newloadProgresss[i] = event.loaded;
-//           setloadProgresss([...newloadProgresss]);
-//         });
-//         newDwvApps[i] = app;
-//       }
-//       setDwvApps(newDwvApps);
-//     }
-//   };
-//   return (
-//     <>
-//     <div>
-//         <label htmlFor="folderInput">Select a Folder:</label>
-//         <input
-//           type="file"
-//           id="folderInput"
-//           directory=""
-//           webkitdirectory=""
-//           onChange={handleFolderSelect}
-//         />
-//       </div>
-//     <div>
-//       <ReactSimplyCarousel
-//         activeSlideIndex={activeSlideIndex}
-//         onRequestChange={setActiveSlideIndex}
-//         itemsToShow={1}
-//         itemsToScroll={1}
-//         forwardBtnProps={{
-//           //here you can also pass className, or any other button element attributes
-//           style: {
-//             alignSelf: 'center',
-//             background: 'white',
-//             border: 'none',
-//             borderRadius: '50%',
-//             color: 'black',
-//             cursor: 'pointer',
-//             fontSize: '20px',
-//             height: 30,
-//             lineHeight: 1,
-//             textAlign: 'center',
-//             width: 30,
-//           },
-//           children: <span>{`>`}</span>,
-//         }}
-//         backwardBtnProps={{
-//           //here you can also pass className, or any other button element attributes
-//           style: {
-//             alignSelf: 'center',
-//             background: 'white',
-//             border: 'none',
-//             borderRadius: '50%',
-//             color: 'black',
-//             cursor: 'pointer',
-//             fontSize: '20px',
-//             height: 30,
-//             lineHeight: 1,
-//             textAlign: 'center',
-//             width: 30,
-//           },
-//           children: <span>{`<`}</span>,
-//         }}
-//         responsiveProps={[
-//           {
-//             itemsToShow: 1,
-//             itemsToScroll: 1,
-//             // minWi  dth: 768,
-//           },
-//         ]}
-//         speed={400}
-//         easing="linear"
-//       >
-//             {dwvApps.map((dwvApp, index) => (
-//               <div
-//                 style={{ height: '100px', width: '100px' }}
-//                 key={index}
-//                 id={`layerGroup${index}`}
-//                 className="layerGroup"
-//               ></div>
-//           ))}
-      
-//       </ReactSimplyCarousel>
-//     </div>
-//     </>
-
-//   )
-// }
-
-
-
-import React from 'react'
-import ReactDOM from 'react-dom';
-import { Carousel } from '@trendyol-js/react-carousel';
+import React, { useEffect, useRef } from 'react';
+import cornerstone from 'cornerstone-core';
+import cornerstoneTools from 'cornerstone-tools';
+import dicomParser from 'dicom-parser';
 
 export const DwvSlider = () => {
-  const data=['dhruv','zeel','sneh']
-  return (
-    <Carousel>
-      {data.map((name,index)=>{
-        return(
-          <>
-          {name}
-          </>
-        )
-      })}
-    </Carousel>
-  )
+  const canvasRef = useRef(null);
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const dicomData = reader.result;
+        displayDicomImage(dicomData);
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    cornerstone.enable(canvas);
+
+    const fileReader = new FileReader();
+    fileReader.onload = function (e) {
+      const dicomData = new Uint8Array(e.target.result);
+      const dataSet = dicomParser.parseDicom(dicomData);
+      const imagePixelModule = dataSet.dict['x00280103'];
+
+      const image = {
+        imageId: `dicom:${dicomFile.name}`,
+        minPixelValue: imagePixelModule.value[0],
+        maxPixelValue: imagePixelModule.value[1],
+        slope: 1.0,
+        intercept: 0,
+        windowCenter: (imagePixelModule.value[0] + imagePixelModule.value[1]) / 2,
+        windowWidth: imagePixelModule.value[1] - imagePixelModule.value[0],
+        getPixelData: () => dicomData,
+      };
+
+      cornerstone.displayImage(canvas, image);
+    };
+
+    fileReader.readAsArrayBuffer(dicomFile);
+    
+    return () => {
+      cornerstone.disable(canvas);
+    };
+  }, [dicomFile]);
+
+  return 
+  <>
+  <input type="file" accept=".dcm" onChange={handleFileChange} />
+  <canvas ref={canvasRef} />;
+  </>
 }
