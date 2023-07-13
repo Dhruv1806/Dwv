@@ -1,29 +1,31 @@
-import React, { useEffect, useRef,useState } from 'react';
-import cornerstone from 'cornerstone-core';
-import { CornerstoneViewport } from 'react-cornerstone-viewport';
+import React, { useState } from 'react'
+import { App, getDwvVersion } from "dwv";
 
 
 export const Try1 = () => {
-    const [selectedFiles, setSelectedFiles] = useState([]);
-    const viewportElement = useRef(null);
+    const [dwv,setDwv]=useState()
+
+    const [versions] = useState({
+        dwv: getDwvVersion(),
+        react: React.version
+      });
+
+      // Initialize the dwv application
+    const app = new App();
+
+    // Set the target DICOM container element
+    app.init({
+      dataViewConfigs: {divId: 'layerGroup0'}
+    });
+
     const handleFileSelect = (event) => {
-        const files = Array.from(event.target.files);
-        setSelectedFiles(files);
+        const files =event.target.files
+       setDwv(files)
       };
-    useEffect(() => {
-        cornerstone.enable(viewportElement.current);
-        cornerstone.loadImage(selectedFiles).then((image) => {
-          cornerstone.displayImage(viewportElement.current, image);
-        });
-    
-        return () => {
-          cornerstone.disable(viewportElement.current);
-        };
-      }, [selectedFiles]);
+    console.log(dwv);
   return (
-    <>
-       <input type="file" multiple directory="" webkitdirectory="" onChange={handleFileSelect} />
-     <div ref={viewportElement} style={{ width: '100%', height: '100%' }} />
-    </>
+    <div>
+        <input type="file" multiple directory="" onChange={handleFileSelect} />
+    </div>
   )
 }
