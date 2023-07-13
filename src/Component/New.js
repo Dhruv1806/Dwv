@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { App } from "dwv";
 
 export const New = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -39,9 +40,15 @@ export const New = () => {
     }
   };
 
-  const handleFile = (file) => {
+  const app = new App();
+  const handleDisplay=(file)=>{
+    app.init({
+      dataViewConfigs: { "*": [{ divId: 'layerGroup' }] }
+    });
+    app.loadFiles([file,1]);
     console.log(file);
-  };
+    // app.clear()
+  }
 
   return (
     <div>
@@ -77,7 +84,7 @@ export const New = () => {
                   {expandedIndex === index && (
                     <>
                       {subfolderFiles.map((file, fileIndex) => (
-                        <div style={{backgroundColor:"grey"}} key={fileIndex} onClick={() => setDisplay(file.name)}>
+                        <div style={{backgroundColor:"grey"}} key={fileIndex} onClick={() => handleDisplay(file)}>
                           {file.name}
                         </div>
                       ))}
@@ -88,7 +95,7 @@ export const New = () => {
             </div>
           )}
         </div>
-        <div style={{ backgroundColor: 'green', height: '100%', padding: '22% 41%' , position:"sticky",top:"56px" }}>{display}</div>
+        <div id='layerGroup' />
       </div>
     </div>
   );

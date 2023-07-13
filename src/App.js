@@ -10,11 +10,9 @@ import { Try1 } from './Component/Try1';
 function App() {
  return(
  <>
- {/* <Dwn/> */}
+ {/* <Try1/> */}
      {/* <Dwv/> */}
-  {/* <DwvSlider/> */}
-  {/* <New/> */}
-  <Try1/>
+  <New/>
  </>
  )
 }

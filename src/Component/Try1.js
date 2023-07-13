@@ -1,31 +1,15 @@
-import React, { useState } from 'react'
-import { App, getDwvVersion } from "dwv";
-
+import React from 'react'
 
 export const Try1 = () => {
-    const [dwv,setDwv]=useState()
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+      const fileObject = [file, 1];
+      console.log(fileObject); 
+    };
 
-    const [versions] = useState({
-        dwv: getDwvVersion(),
-        react: React.version
-      });
-
-      // Initialize the dwv application
-    const app = new App();
-
-    // Set the target DICOM container element
-    app.init({
-      dataViewConfigs: {divId: 'layerGroup0'}
-    });
-
-    const handleFileSelect = (event) => {
-        const files =event.target.files
-       setDwv(files)
-      };
-    console.log(dwv);
+   
+  
   return (
-    <div>
-        <input type="file" multiple directory="" onChange={handleFileSelect} />
-    </div>
+    <input type="file" onChange={handleFileUpload} />
   )
 }
