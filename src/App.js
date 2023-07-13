@@ -4,6 +4,7 @@ import { Dwv } from './Component/Dwv';
 // import { DwvSlider } from './Component/DwvSlider';
 import { Dwn } from './Component/Dwn';
 import { New } from './Component/New';
+import { Try1 } from './Component/Try1';
 
 
 function App() {
@@ -12,7 +13,8 @@ function App() {
  {/* <Dwn/> */}
      {/* <Dwv/> */}
   {/* <DwvSlider/> */}
-  <New/>
+  {/* <New/> */}
+  <Try1/>
  </>
  )
 }
